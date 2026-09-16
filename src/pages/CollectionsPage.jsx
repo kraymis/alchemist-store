@@ -1,0 +1,5 @@
+import { Link } from 'react-router-dom'
+import { collections, products } from '../data/store'
+export function CollectionsPage() {
+  return <section className="page-section"><div className="page-intro"><p className="eyebrow">The Alchemist Store</p><h1>Collections</h1><p>Des sélections pensées pour construire votre vestiaire, saison après saison.</p></div><div className="collection-page-grid">{collections.map((collection, index) => <Link className={`collection-feature collection-feature-${collection.visual}`} to={`/collections/${collection.id}`} key={collection.id}><div className="collection-art" style={{ backgroundImage: `url(${collection.image})` }}><span className={`collection-shape collection-shape-${(index % 3) + 1}`} /></div><div className="collection-content"><p className="eyebrow">{collection.eyebrow}</p><h3>{collection.name}</h3><p className="collection-description">{collection.description}</p><span className="text-link">{products.filter((product) => product.collection === collection.id).length} articles · Explorer <span>→</span></span></div></Link>)}</div></section>
+}
