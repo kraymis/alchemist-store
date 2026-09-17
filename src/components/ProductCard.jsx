@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/useCart'
+import { useWishlist } from '../context/useWishlist'
 
 export function ProductCard({ product, featured = false }) {
   const { addItem } = useCart()
+  const { has, toggle } = useWishlist()
+  const isFavorite = has(product.id)
   return (
     <article className={`product-card ${featured ? 'featured-product' : ''}`}>
       <Link to={`/shop/${product.id}`} className={`product-image product-image-${product.visual}`} aria-label={`Voir ${product.name}`}>
@@ -11,7 +14,7 @@ export function ProductCard({ product, featured = false }) {
         <img className="product-photo product-photo-secondary" src={product.images?.[1]} alt="" loading="lazy" />
         <span className="view-product">Voir le produit <span>→</span></span>
       </Link>
-      <div className="product-info"><div><p className="product-category">{product.category}</p><h3>{product.name}</h3><div className="color-dots">{product.colors?.slice(0, 3).map((color) => <span title={color} key={color} />)}</div></div><div className="product-price"><strong>{product.price.toLocaleString('fr-FR')} DA</strong><button type="button" onClick={() => addItem(product)}>Ajouter</button></div></div>
+      <div className="product-info"><div><p className="product-category">{product.category}</p><h3>{product.name}</h3><div className="color-dots">{product.colors?.slice(0, 3).map((color) => <span title={color} key={color} />)}</div></div><div className="product-price"><strong>{product.price.toLocaleString('fr-FR')} DA</strong><div className="product-actions"><button className={isFavorite ? 'favorite-toggle active' : 'favorite-toggle'} type="button" onClick={() => toggle(product.id)} aria-label={isFavorite ? `Retirer ${product.name} des favoris` : `Ajouter ${product.name} aux favoris`} aria-pressed={isFavorite}>♥</button><button type="button" onClick={() => addItem(product)}>Ajouter</button></div></div></div>
     </article>
   )
 }

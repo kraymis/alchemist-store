@@ -1,4 +1,5 @@
-import { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
+import { useToast } from './useToast'
 
 const CartContext = createContext(null)
 
@@ -8,6 +9,7 @@ function createId(prefix = 'item') {
 }
 
 export function CartProvider({ children }) {
+  const { notify } = useToast()
   const [items, setItems] = useState(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem('alchemist-cart') || '[]')
@@ -18,8 +20,12 @@ export function CartProvider({ children }) {
   })
 
   useEffect(() => {
-    window.localStorage.setItem('alchemist-cart', JSON.stringify(items))
-  }, [items])
+    try {
+      window.localStorage.setItem('alchemist-cart', JSON.stringify(items))
+    } catch {
+      notify('Impossible d’enregistrer le panier sur cet appareil.', 'error')
+    }
+  }, [items, notify])
 
   const addItem = (product, options = {}) => {
     const size = options.size || product.sizes?.[0] || 'M'
@@ -45,14 +51,19 @@ export function CartProvider({ children }) {
       if (existing) return current.map((item) => item.id === id ? { ...item, quantity: item.quantity + (options.quantity || 1) } : item)
       return [...current, { id, productId: product.id, name: product.name, price: product.price, image: options.image || product.images?.[0], size, color, visual: product.visual, quantity: options.quantity || 1, customized: false }]
     })
+    notify(customized ? 'T-shirt personnalisé ajouté au panier !' : `${product.name} ajouté au panier !`)
   }
 
-  const updateQuantity = (id, quantity) => {
-    setItems((current) => current.map((item) => item.id === id ? { ...item, quantity } : item).filter((item) => item.quantity > 0))
+  const updateQuantity = (id, quantity) => setItems((current) => current.map((item) => item.id === id ? { ...item, quantity } : item).filter((item) => item.quantity > 0))
+  const removeItem = (id) => {
+    setItems((current) => current.filter((item) => item.id !== id))
+    notify('Article retiré du panier.')
   }
-  const removeItem = (id) => setItems((current) => current.filter((item) => item.id !== id))
-  const clearCart = () => setItems([])
-  const value = useMemo(() => ({
+  const clearCart = () => {
+    setItems([])
+    notify('Panier vidé.')
+  }
+  const value = {
     items,
     addItem,
     updateQuantity,
@@ -60,7 +71,7 @@ export function CartProvider({ children }) {
     clearCart,
     count: items.reduce((total, item) => total + item.quantity, 0),
     subtotal: items.reduce((total, item) => total + item.price * item.quantity, 0),
-  }), [items])
+  }
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

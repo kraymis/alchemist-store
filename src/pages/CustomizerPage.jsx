@@ -3,6 +3,7 @@ import { Canvas, FabricImage, IText } from 'fabric'
 import { Copy, Eye, EyeOff, Layers, Move, Plus, RotateCw, Save, Trash2, Upload, Type } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../context/useCart'
+import { useToast } from '../context/useToast'
 import { tshirtMockups } from '../data/mockups'
 
 const CANVAS = { width: 420, height: 294 }
@@ -54,6 +55,7 @@ export function CustomizerPage() {
   const sideStates = useRef({ front: null, back: null })
   const sideRef = useRef(side)
   const { addItem } = useCart()
+  const { notify } = useToast()
   const mockup = tshirtMockups.find((item) => item.id === colorId) || tshirtMockups[0]
   useEffect(() => {
     sideRef.current = side
@@ -179,25 +181,17 @@ export function CustomizerPage() {
     refreshLayers()
   }
 
-  const saveDesign = () => {
+  const buildCustomization = async () => {
     const canvas = canvasRef.current
-    const design = { side, color: mockup.name, canvas: canvas.toJSON(['excludeFromExport']) }
-    window.localStorage.setItem(`alchemist-design-${side}`, JSON.stringify(design))
-    window.localStorage.setItem('alchemist-design-saved', JSON.stringify(design))
-    window.localStorage.setItem('alchemist-design-last', side)
-    setSaved(true)
-    window.setTimeout(() => setSaved(false), 2200)
-  }
-
-  const addToCart = async () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    if (!canvas) throw new Error('Canvas unavailable')
     sideStates.current[side] = canvas.toJSON(['excludeFromExport'])
     const front = sideStates.current.front
     const back = sideStates.current.back
     const frontPreview = await createMockupPreview(mockup.frontImage, front)
     const backPreview = await createMockupPreview(mockup.backImage, back)
-    const customization = {
+    return {
+      id: designId || (window.crypto?.randomUUID?.() || `design-${Date.now()}`),
+      createdAt: new Date().toISOString(),
       productType: 'custom-tshirt',
       color: mockup.name,
       front,
@@ -206,6 +200,37 @@ export function CustomizerPage() {
       backPreview,
       frontDesignImage: firstDesignSource(front),
       backDesignImage: firstDesignSource(back),
+    }
+  }
+
+  const saveDesign = async () => {
+    try {
+      const customization = await buildCustomization()
+      const design = { side, color: mockup.name, canvas: sideStates.current[side] }
+      const savedDesigns = JSON.parse(window.localStorage.getItem('alchemist-customizations') || '[]')
+      const nextSavedDesigns = [customization, ...savedDesigns.filter((item) => item.id !== customization.id)].slice(0, 12)
+      window.localStorage.setItem(`alchemist-design-${side}`, JSON.stringify(design))
+      window.localStorage.setItem(`alchemist-design-${customization.id}`, JSON.stringify(design))
+      window.localStorage.setItem('alchemist-design-saved', JSON.stringify(design))
+      window.localStorage.setItem('alchemist-customizations', JSON.stringify(nextSavedDesigns))
+      window.localStorage.setItem('alchemist-design-last', side)
+      setSaved(true)
+      window.setTimeout(() => setSaved(false), 2200)
+      notify('Personnalisation enregistrée !')
+      return customization
+    } catch {
+      notify('Impossible d’enregistrer la personnalisation. Réessayez.', 'error')
+      return null
+    }
+  }
+
+  const addToCart = async () => {
+    let customization
+    try {
+      customization = await buildCustomization()
+    } catch {
+      notify('Impossible de préparer les aperçus du t-shirt.', 'error')
+      return
     }
     addItem({
       id: 'custom-tshirt',

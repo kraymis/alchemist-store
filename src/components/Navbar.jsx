@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { store } from '../data/store'
 import { useCart } from '../context/useCart'
+import { useWishlist } from '../context/useWishlist'
 
 export function Navbar({ theme, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -9,6 +10,7 @@ export function Navbar({ theme, onToggleTheme }) {
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { count } = useCart()
+  const { count: wishlistCount } = useWishlist()
   const submitSearch = (event) => {
     event.preventDefault()
     navigate(`/shop${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`)
@@ -31,7 +33,7 @@ export function Navbar({ theme, onToggleTheme }) {
       </nav>
       <div className="nav-tools">
         <button className="icon-button" type="button" aria-label="Rechercher" onClick={() => setSearchOpen((open) => !open)}>⌕</button>
-        <Link className="icon-button nav-desktop-only" to="/shop?wishlist=true" aria-label="Favoris">♡</Link>
+        <Link className="icon-button wishlist-button nav-desktop-only" to="/shop?wishlist=true" aria-label={`Favoris (${wishlistCount})`}>♡{wishlistCount > 0 && <span>{wishlistCount}</span>}</Link>
         <Link className="icon-button cart-button" to="/cart" aria-label="Panier">▢<span>{count}</span></Link>
         <button className="theme-button" type="button" onClick={onToggleTheme} aria-label="Changer de thème">{theme === 'dark' ? '☀︎' : '☾'}</button>
         <button className="menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-label="Ouvrir le menu"><span /><span /></button>

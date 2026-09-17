@@ -1,0 +1,3 @@
+import { Schema, model } from 'mongoose'
+const item = new Schema({ type: { type: String, enum: ['product','custom_tshirt'], required: true }, productId: String, name: String, image: String, frontImage: String, backImage: String, customizationData: Schema.Types.Mixed, quantity: Number, unitPrice: Number, size: String, color: String }, { _id: false })
+export const Order = model('Order', new Schema({ customer: { fullName: String, phone: String, email: String, wilaya: String, commune: String, address: String, notes: String }, items: [item], total: Number, status: { type: String, enum: ['pending','confirmed','processing','shipped','delivered','cancelled'], default: 'pending' } }, { timestamps: true }))
