@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ProductCard } from '../components/ProductCard'
 import { useCart } from '../context/useCart'
-import { products } from '../data/store'
+import { useProducts } from '../lib/products'
+import { assetUrl } from '../lib/api'
 
 export function ProductPage() {
   const { productId } = useParams()
+  const { products, loading } = useProducts()
   const product = products.find((item) => item.id === productId)
   const [size, setSize] = useState(product?.sizes?.[0] || '')
   const [color, setColor] = useState(product?.colors?.[0] || '')
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const { addItem } = useCart()
+  useEffect(() => { if (product) { setSize(product.sizes?.[0] || ''); setColor(product.colors?.[0] || '') } }, [productId, product])
+
+  if (loading && !product) return <section className="page-section empty-state"><p>Chargement du produit…</p></section>
 
   if (!product) return <section className="page-section empty-state"><p className="eyebrow">Boutique</p><h1>Article introuvable</h1><p>Cette pièce n’est plus disponible ou n’existe pas.</p><Link className="button button-dark" to="/shop">Retour à la boutique</Link></section>
 
@@ -24,8 +29,8 @@ export function ProductPage() {
     <p className="breadcrumbs"><Link to="/shop">Boutique</Link> / {product.category} / {product.name}</p>
     <div className="product-detail">
       <div className="product-gallery">
-        <div className={`product-detail-visual product-image-${product.visual}`}><img src={product.images?.[selectedImage]} alt={`${product.name} vue ${selectedImage + 1}`} /></div>
-        <div className="product-thumbnails">{product.images?.map((image, index) => <button className={selectedImage === index ? 'active' : ''} type="button" onClick={() => setSelectedImage(index)} key={image} aria-label={`Voir ${product.name}, vue ${index + 1}`} aria-pressed={selectedImage === index}><img src={image} alt="" /></button>)}</div>
+        <div className={`product-detail-visual product-image-${product.visual}`}><img src={assetUrl(product.images?.[selectedImage])} alt={`${product.name} vue ${selectedImage + 1}`} /></div>
+        <div className="product-thumbnails">{product.images?.map((image, index) => <button className={selectedImage === index ? 'active' : ''} type="button" onClick={() => setSelectedImage(index)} key={image} aria-label={`Voir ${product.name}, vue ${index + 1}`} aria-pressed={selectedImage === index}><img src={assetUrl(image)} alt="" /></button>)}</div>
       </div>
       <div className="product-detail-copy">
         <p className="eyebrow">{product.category}</p><h1>{product.name}</h1><strong className="detail-price">{product.price.toLocaleString('fr-FR')} DA</strong><p className="detail-description">{product.description}</p>

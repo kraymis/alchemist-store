@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, FabricImage, IText } from 'fabric'
+import { Canvas, FabricImage, IText, Polygon } from 'fabric'
 import { Copy, Eye, EyeOff, Layers, Move, Plus, RotateCw, Save, Trash2, Upload, Type } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../context/useCart'
 import { useToast } from '../context/useToast'
 import { tshirtMockups } from '../data/mockups'
 
-const CANVAS = { width: 420, height: 294 }
+// Native coordinates of the supplied 1499 × 1049 reference mockup. The points
+// trace the crosses around the garment; they are not a responsive CSS rectangle.
+const CANVAS = { width: 1499, height: 1049 }
+const PRINT_AREA = [
+  [646, 103], [546, 126], [429, 185], [303, 420], [421, 522], [486, 492],
+  [486, 963], [1058, 983], [1058, 492], [1124, 522], [1254, 420], [1116, 184], [902, 103],
+].map(([x, y]) => ({ x, y }))
+
+function printAreaClip() {
+  return new Polygon(PRINT_AREA, { left: 0, top: 0, originX: 'left', originY: 'top', absolutePositioned: true })
+}
 
 function clearArtworkClip(object) {
   object.set({ clipPath: undefined })
@@ -30,6 +40,7 @@ async function createMockupPreview(mockupSource, designState) {
       renderOnAddRemove: false,
     })
     await designCanvas.loadFromJSON(designState)
+    designCanvas.clipPath = printAreaClip()
     designCanvas.getObjects().forEach(clearArtworkClip)
     context.drawImage(designCanvas.toCanvasElement(), 0, 0, CANVAS.width, CANVAS.height)
     designCanvas.dispose()
@@ -82,12 +93,24 @@ export function CustomizerPage() {
       preserveObjectStacking: true,
       selection: true,
     })
+    canvas.clipPath = printAreaClip()
     canvasRef.current = canvas
     canvas.on('selection:created', (event) => setSelected(event.selected?.[0] || null))
     canvas.on('selection:updated', (event) => setSelected(event.selected?.[0] || null))
     canvas.on('selection:cleared', () => setSelected(null))
     canvas.on('object:added', refreshLayers)
     canvas.on('object:removed', refreshLayers)
+    canvas.on('object:moving', (event) => {
+      const object = event.target
+      if (!object) return
+      // Keep the object centre on the real traced garment, while the polygon clip
+      // remains the exact authority for the final printed pixels.
+      const point = { x: object.getCenterPoint().x, y: object.getCenterPoint().y }
+      if (point.x < 350) object.left += 350 - point.x
+      if (point.x > 1150) object.left -= point.x - 1150
+      if (point.y < 145) object.top += 145 - point.y
+      if (point.y > 940) object.top -= point.y - 940
+    })
     const savedDesign = designId
       ? window.localStorage.getItem(`alchemist-design-${designId}`) || window.localStorage.getItem('alchemist-design-saved')
       : window.localStorage.getItem(`alchemist-design-${sideRef.current}`)
@@ -111,17 +134,16 @@ export function CustomizerPage() {
     const canvas = canvasRef.current
     if (!canvas) return
     const text = new IText('VOTRE TEXTE', {
-      left: CANVAS.width / 2,
-      top: CANVAS.height / 2,
+      left: 752,
+      top: 525,
       originX: 'center',
       originY: 'center',
       fill: '#26231f',
       fontFamily: 'Arial',
-      fontSize: 28,
+      fontSize: 92,
       fontWeight: '600',
       charSpacing: 60,
       opacity: .92,
-      globalCompositeOperation: 'multiply',
       cornerColor: '#c85f31',
       cornerStyle: 'circle',
       transparentCorners: false,
@@ -137,8 +159,8 @@ export function CustomizerPage() {
     const reader = new FileReader()
     reader.onload = async () => {
       const image = await FabricImage.fromURL(reader.result)
-      image.set({ left: CANVAS.width / 2, top: CANVAS.height / 2, originX: 'center', originY: 'center', cornerColor: '#c85f31', cornerStyle: 'circle', transparentCorners: false, opacity: .9 })
-           const ratio = Math.min((CANVAS.width * .5) / image.width, (CANVAS.height * .5) / image.height)
+      image.set({ left: 752, top: 525, originX: 'center', originY: 'center', cornerColor: '#c85f31', cornerStyle: 'circle', transparentCorners: false, opacity: .9 })
+           const ratio = Math.min(560 / image.width, 560 / image.height)
       image.scale(ratio)
       canvasRef.current.add(image)
       canvasRef.current.setActiveObject(image)
@@ -167,7 +189,7 @@ export function CustomizerPage() {
 
   const centerSelected = () => {
     if (!selected) return
-    selected.set({ left: CANVAS.width / 2, top: CANVAS.height / 2 })
+    selected.set({ left: 752, top: 525 })
     canvasRef.current.renderAll()
   }
 
@@ -200,6 +222,7 @@ export function CustomizerPage() {
       backPreview,
       frontDesignImage: firstDesignSource(front),
       backDesignImage: firstDesignSource(back),
+      printArea: { sourceWidth: CANVAS.width, sourceHeight: CANVAS.height, polygon: PRINT_AREA },
     }
   }
 

@@ -17,6 +17,8 @@ import { CheckoutPage } from './pages/CheckoutPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminOrderPage } from './pages/AdminOrderPage'
+import { AdminProductsPage } from './pages/AdminProductsPage'
+import { AdminProductFormPage } from './pages/AdminProductFormPage'
 
 const CustomizerPage = lazy(() => import('./pages/CustomizerPage').then((module) => ({ default: module.CustomizerPage })))
 
@@ -38,6 +40,9 @@ function App() {
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/admin/orders/:id" element={<AdminOrderPage />} />
+            <Route path="/admin/products" element={<AdminProductsPage />} />
+            <Route path="/admin/products/new" element={<AdminProductFormPage />} />
+            <Route path="/admin/products/:id/edit" element={<AdminProductFormPage />} />
             <Route element={<MainLayout theme={theme} onToggleTheme={toggleTheme} />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/shop" element={<ShopPage />} />
