@@ -18,7 +18,7 @@ export function ShopPage() {
   const sort = params.get('sort') || 'featured'
   const wishlistOnly = params.get('wishlist') === 'true'
   const page = Math.max(1, Number.parseInt(params.get('page') || '1', 10) || 1)
-  const pageSize = 12
+  const pageSize = 9
 
   const updateParam = (key, value) => {
     const next = new URLSearchParams(params)

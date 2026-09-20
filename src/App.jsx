@@ -22,6 +22,12 @@ import { AdminProductFormPage } from './pages/AdminProductFormPage'
 
 const CustomizerPage = lazy(() => import('./pages/CustomizerPage'))
 
+function AdminEntry() {
+  return window.localStorage.getItem('alchemist-admin-token')
+    ? <Navigate to="/admin/dashboard" replace />
+    : <Navigate to="/admin/login" replace />
+}
+
 function App() {
   const [theme, setTheme] = useState(() => window.localStorage.getItem('alchemist-theme') || 'dark')
   useEffect(() => {
@@ -37,6 +43,7 @@ function App() {
           <WishlistProvider>
           <div className="site-shell">
           <Routes>
+            <Route path="/admin" element={<AdminEntry />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/admin/orders/:id" element={<AdminOrderPage />} />

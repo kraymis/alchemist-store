@@ -20,13 +20,13 @@ export function ProductPage() {
 
   if (!product) return <section className="page-section empty-state"><p className="eyebrow">Boutique</p><h1>Article introuvable</h1><p>Cette pièce n’est plus disponible ou n’existe pas.</p><Link className="button button-dark" to="/shop">Retour à la boutique</Link></section>
 
-  const related = products.filter((item) => item.id !== product.id && (item.category === product.category || item.collection === product.collection)).slice(0, 3)
+  const related = products.filter((item) => item.id !== product.id && (item.category === product.category || item.collection === product.collection)).slice(0, 6)
   const addSelectionToCart = () => {
     for (let index = 0; index < quantity; index += 1) addItem(product, { size, color })
   }
 
   return <section className="page-section product-page">
-    <p className="breadcrumbs"><Link to="/shop">Boutique</Link> / {product.category} / {product.name}</p>
+    <p className="breadcrumbs"><Link to="/shop">Boutique</Link> / <Link to={`/shop?category=${encodeURIComponent(product.category)}`}>{product.category}</Link> / {product.name}</p>
     <div className="product-detail">
       <div className="product-gallery">
         <div className={`product-detail-visual product-image-${product.visual}`}><img src={assetUrl(product.images?.[selectedImage])} alt={`${product.name} vue ${selectedImage + 1}`} /></div>
@@ -40,6 +40,6 @@ export function ProductPage() {
         <button className="button button-dark add-detail" type="button" onClick={addSelectionToCart}>Ajouter au panier <span>→</span></button><p className="availability">Disponible en boutique · Retrait à Mostaganem</p>
       </div>
     </div>
-    {related.length > 0 && <div className="related"><div className="section-heading"><div><p className="eyebrow">À découvrir aussi</p><h2>Vous pourriez aimer.</h2></div></div><div className="shop-grid">{related.map((item) => <ProductCard product={item} key={item.id} />)}</div></div>}
+    {related.length > 0 && <div className="related"><div className="section-heading"><div><p className="eyebrow">À découvrir aussi</p><h2>Vous pourriez aimer.</h2></div><Link className="text-link" to={`/shop?category=${encodeURIComponent(product.category)}`}>Voir toute la boutique <span>→</span></Link></div><div className="related-scroll">{related.map((item) => <ProductCard product={item} key={item.id} />)}</div></div>}
   </section>
 }
