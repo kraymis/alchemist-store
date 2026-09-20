@@ -17,7 +17,3 @@ services:
         value: 7d
       - key: FRONTEND_URL
         sync: false
-    disk:
-      name: alchemist-customizations
-      mountPath: /opt/render/project/src/backend/uploads
-      sizeGB: 1
