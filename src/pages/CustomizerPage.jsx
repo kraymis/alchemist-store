@@ -6,13 +6,11 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
-  ImagePlus,
   Layers3,
   Minus,
   Plus,
   RotateCcw,
   RotateCw,
-  Save,
   ShoppingBag,
   Trash2,
   Type,
@@ -22,12 +20,10 @@ import {
 import { tshirtMockups } from '../data/mockups'
 import { CartContext } from '../context/CartContext'
 import { useToast } from '../context/useToast'
+import { api } from '../lib/api'
 
 const CANVAS_WIDTH = 1499
 const CANVAS_HEIGHT = 1049
-
-const CUSTOMIZATION_STORAGE_KEY = 'alchemist-customizations'
-const DESIGN_STORAGE_PREFIX = 'alchemist-design'
 
 function createCustomizationId() {
   if (window.crypto?.randomUUID) {
@@ -37,39 +33,12 @@ function createCustomizationId() {
   return `custom-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
-function getStoredDesign(side) {
-  try {
-    const value = window.localStorage.getItem(
-      `${DESIGN_STORAGE_PREFIX}-${side}`,
-    )
-
-    if (!value) return null
-
-    const state = JSON.parse(value)
-    const hasTemporaryImage = state?.objects?.some(
-      (object) => typeof object?.src === 'string' && object.src.startsWith('blob:'),
-    )
-
-    if (hasTemporaryImage) {
-      window.localStorage.removeItem(`${DESIGN_STORAGE_PREFIX}-${side}`)
-      return null
-    }
-
-    return state
-  } catch {
-    return null
-  }
+function getStoredDesign(_side) {
+  return null
 }
 
-function saveStoredDesign(side, state) {
-  try {
-    window.localStorage.setItem(
-      `${DESIGN_STORAGE_PREFIX}-${side}`,
-      JSON.stringify(state),
-    )
-  } catch {
-    // Ignore localStorage errors.
-  }
+function saveStoredDesign(_side, _state) {
+  return undefined
 }
 
 function getFirstImageSource(state) {
@@ -85,27 +54,11 @@ function getFirstImageSource(state) {
   return image?.src || null
 }
 
-async function fileToPersistentDataUrl(file) {
-  const source = await new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result || ''))
-    reader.onerror = () => reject(reader.error || new Error('Image read failed'))
-    reader.readAsDataURL(file)
-  })
-
-  if (file.type === 'image/svg+xml') return source
-
-  const image = await FabricImage.fromURL(source)
-  const width = image.width || 1
-  const height = image.height || 1
-  const scale = Math.min(1, 1200 / width, 1200 / height)
-  const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(width * scale))
-  canvas.height = Math.max(1, Math.round(height * scale))
-  const context = canvas.getContext('2d')
-  if (!context) return source
-  context.drawImage(image.getElement(), 0, 0, canvas.width, canvas.height)
-  return canvas.toDataURL('image/webp', 0.82)
+function dataUrlToBlob(dataUrl) {
+  const [header, encoded] = dataUrl.split(',')
+  const mime = header.match(/data:([^;]+)/)?.[1] || 'image/webp'
+  const binary = atob(encoded)
+  return new Blob([Uint8Array.from(binary, (character) => character.charCodeAt(0))], { type: mime })
 }
 
 export default function CustomizerPage() {
@@ -130,8 +83,8 @@ export default function CustomizerPage() {
   const [selectedObject, setSelectedObject] = useState(null)
   const [layers, setLayers] = useState([])
 
-  const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const uploadedFiles = useRef({ front: null, back: null })
 
   const mockup =
     tshirtMockups.find((item) => item.id === colorId) ||
@@ -360,17 +313,14 @@ export default function CustomizerPage() {
 
     const handleObjectAdded = () => {
       refreshLayers()
-      setSaved(false)
     }
 
     const handleObjectRemoved = () => {
       refreshLayers()
-      setSaved(false)
     }
 
     const handleObjectModified = () => {
       refreshLayers()
-      setSaved(false)
     }
 
     canvas.on(
@@ -505,7 +455,6 @@ export default function CustomizerPage() {
     refreshLayers()
 
     setSelectedObject(text)
-    setSaved(false)
 
     /*
      * Immediately allow the user to type.
@@ -543,7 +492,14 @@ export default function CustomizerPage() {
       }
 
       try {
-        const imageSource = await fileToPersistentDataUrl(file)
+        const form = new FormData()
+        form.append('files', file)
+        form.append('roles', `${currentSideRef.current}-design`)
+        const uploaded = await api('/customizations/upload', { method: 'POST', body: form })
+        const metadata = uploaded.files?.[0]
+        if (!metadata?.url) throw new Error('Upload failed')
+        uploadedFiles.current[currentSideRef.current] = metadata
+        const imageSource = metadata.url
         const image = await FabricImage.fromURL(imageSource, {
           crossOrigin: 'anonymous',
         })
@@ -588,7 +544,6 @@ export default function CustomizerPage() {
         refreshLayers()
 
         setSelectedObject(image)
-        setSaved(false)
 
         notify('Design ajouté au T-shirt.')
       } catch (error) {
@@ -632,7 +587,6 @@ export default function CustomizerPage() {
 
     refreshLayers()
 
-    setSaved(false)
 
     canvas.requestRenderAll()
   }, [
@@ -671,7 +625,6 @@ export default function CustomizerPage() {
 
       refreshLayers()
 
-      setSaved(false)
     },
     [
       refreshLayers,
@@ -704,7 +657,6 @@ export default function CustomizerPage() {
 
       canvas.requestRenderAll()
 
-      setSaved(false)
     },
     [selectedObject],
   )
@@ -740,7 +692,6 @@ export default function CustomizerPage() {
 
       canvas.requestRenderAll()
 
-      setSaved(false)
     },
     [selectedObject],
   )
@@ -788,7 +739,6 @@ export default function CustomizerPage() {
         nextState,
       )
 
-      setSaved(false)
     },
     [
       loadArtworkState,
@@ -914,14 +864,15 @@ export default function CustomizerPage() {
         backPreview,
 
         frontDesignImage:
-          getFirstImageSource(
-            frontState,
-          ),
+          uploadedFiles.current.front?.url || getFirstImageSource(frontState),
 
         backDesignImage:
-          getFirstImageSource(
-            backState,
-          ),
+          uploadedFiles.current.back?.url || getFirstImageSource(backState),
+
+        designFiles: [
+          uploadedFiles.current.front,
+          uploadedFiles.current.back,
+        ].filter(Boolean),
       }
     }, [
       changeSide,
@@ -935,62 +886,32 @@ export default function CustomizerPage() {
 
   /*
    * ---------------------------------------------------------
-   * Save
+   * Persist when adding to cart
    * ---------------------------------------------------------
    */
 
-  const saveDesign = useCallback(async () => {
+  const persistCustomization = useCallback(async () => {
     setSaving(true)
 
     try {
-      const customization =
-        await buildCustomization()
-
-      const existing =
-        JSON.parse(
-          window.localStorage.getItem(
-            CUSTOMIZATION_STORAGE_KEY,
-          ) || '[]',
-        )
-
-      const list =
-        Array.isArray(existing)
-          ? existing
-          : []
-
-      const compactCustomization = {
+      const customization = await buildCustomization()
+      const form = new FormData()
+      form.append('files', dataUrlToBlob(customization.frontPreview), 'front-preview.webp')
+      form.append('files', dataUrlToBlob(customization.backPreview), 'back-preview.webp')
+      form.append('roles', 'front-preview')
+      form.append('roles', 'back-preview')
+      const uploaded = await api('/customizations/upload', { method: 'POST', body: form })
+      const previews = uploaded.files || []
+      return {
         ...customization,
-        frontPreview: undefined,
-        backPreview: undefined,
+        frontPreview: previews.find((file) => file.role === 'front-preview')?.url,
+        backPreview: previews.find((file) => file.role === 'back-preview')?.url,
       }
-      list.push(compactCustomization)
-
-      try {
-        window.localStorage.setItem(
-          CUSTOMIZATION_STORAGE_KEY,
-          JSON.stringify(list.slice(-10)),
-        )
-      } catch (storageError) {
-        console.warn('Customization history could not be persisted.', storageError)
-        window.localStorage.removeItem(CUSTOMIZATION_STORAGE_KEY)
-        window.localStorage.setItem(
-          CUSTOMIZATION_STORAGE_KEY,
-          JSON.stringify([compactCustomization]),
-        )
-      }
-
-      setSaved(true)
-
-      notify(
-        'Personnalisation sauvegardée.',
-      )
-
-      return customization
     } catch (error) {
       console.error(error)
 
       notify(
-        'Impossible de sauvegarder la personnalisation.',
+        'Impossible de préparer la personnalisation.',
         'error',
       )
 
@@ -998,10 +919,7 @@ export default function CustomizerPage() {
     } finally {
       setSaving(false)
     }
-  }, [
-    buildCustomization,
-    notify,
-  ])
+  }, [buildCustomization, notify])
 
   /*
    * ---------------------------------------------------------
@@ -1010,8 +928,7 @@ export default function CustomizerPage() {
    */
 
   const addToCart = useCallback(async () => {
-    const customization =
-      await saveDesign()
+    const customization = await persistCustomization()
 
     if (!customization) return
 
@@ -1052,7 +969,7 @@ export default function CustomizerPage() {
     mockup.name,
     navigate,
     notify,
-    saveDesign,
+    persistCustomization,
   ])
 
   /*
@@ -1210,7 +1127,6 @@ export default function CustomizerPage() {
 
             <div className="sidebar-bottom">
               <div className="price-row"><div><span>Custom piece</span><strong>3 200 DA</strong></div><span className="size-badge">Size M</span></div>
-              <button type="button" disabled={saving} onClick={saveDesign} className="save-button"><Save size={17} />{saving ? 'Sauvegarde...' : saved ? 'Personnalisation sauvegardée' : 'Sauvegarder le design'}</button>
               <button type="button" disabled={saving} onClick={addToCart} className="cart-button"><ShoppingBag size={18} />Ajouter au panier <span>3 200 DA</span></button>
             </div>
           </aside>

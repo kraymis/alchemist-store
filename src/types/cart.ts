@@ -7,6 +7,15 @@ export interface CustomizationState {
   backPreview?: string;
   frontDesignImage?: string;
   backDesignImage?: string;
+  designFiles?: Array<{
+    role?: string;
+    url: string;
+    path?: string;
+    fileName?: string;
+    originalName?: string;
+    mimeType?: string;
+    size?: number;
+  }>;
 }
 
 export interface CartItem {

@@ -25,6 +25,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))
 app.use(express.json({ limit: '20mb' }))
-app.use('/uploads', express.static(path.resolve('uploads')))
+app.use('/uploads/products', express.static(path.resolve('uploads/products'), { index: false }))
+app.get('/uploads/customizations/:filename', (req, res) => {
+  if (!/^[a-f0-9-]+\.(png|jpe?g|webp|gif|svg)$/i.test(req.params.filename)) {
+    res.status(404).end()
+    return
+  }
+  res.sendFile(req.params.filename, { root: path.resolve('uploads/customizations'), dotfiles: 'deny' }, (error) => {
+    if (error && !res.headersSent) res.status((error as NodeJS.ErrnoException & { statusCode?: number }).statusCode || 404).end()
+  })
+})
 app.use('/api', api)
 app.use((_err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => res.status(500).json({ message: 'Server error' }))
