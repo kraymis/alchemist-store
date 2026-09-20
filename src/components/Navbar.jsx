@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { ShoppingBag } from 'lucide-react'
 import { store } from '../data/store'
+import { BrandLogo } from './BrandLogo'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
 
@@ -21,9 +22,7 @@ export function Navbar({ theme, onToggleTheme }) {
 
   return (
     <header className="navbar">
-      <Link to="/" className="wordmark" onClick={() => setMenuOpen(false)}>
-        <span className="wordmark-mark">A</span><span>{store.name}</span>
-      </Link>
+      <BrandLogo onClick={() => setMenuOpen(false)} />
       <nav className={`desktop-nav ${menuOpen ? 'mobile-open' : ''}`} aria-label="Navigation principale">
         <NavLink to="/shop" onClick={() => setMenuOpen(false)}>Boutique</NavLink>
         <NavLink to="/collections" onClick={() => setMenuOpen(false)}>Collections</NavLink>
