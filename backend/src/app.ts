@@ -5,8 +5,22 @@ import api from './routes/api.js'
 
 export const app = express()
 
+const allowedOrigins = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5175',
+  'http://127.0.0.1:5175',
+  ...(process.env.FRONTEND_URL || '').split(',').map((origin) => origin.trim()).filter(Boolean),
+])
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5175',
+  origin: (requestOrigin, callback) => {
+    if (!requestOrigin || allowedOrigins.has(requestOrigin)) {
+      callback(null, true)
+      return
+    }
+    callback(new Error(`Origin not allowed by CORS: ${requestOrigin}`))
+  },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }))

@@ -26,9 +26,9 @@ export function Navbar({ theme, onToggleTheme }) {
       <nav className={`desktop-nav ${menuOpen ? 'mobile-open' : ''}`} aria-label="Navigation principale">
         <NavLink to="/shop" onClick={() => setMenuOpen(false)}>Boutique</NavLink>
         <NavLink to="/collections" onClick={() => setMenuOpen(false)}>Collections</NavLink>
-        <NavLink to="/about" onClick={() => setMenuOpen(false)}>À propos</NavLink>
-        <NavLink to="/contact" onClick={() => setMenuOpen(false)}>Contact</NavLink>
         <NavLink to="/customize" onClick={() => setMenuOpen(false)}>Personnaliser</NavLink>
+        <NavLink to="/contact" onClick={() => setMenuOpen(false)}>Contact</NavLink>
+        <NavLink to="/about" onClick={() => setMenuOpen(false)}>À propos</NavLink>
         <a className="mobile-instagram-link" href={store.instagram} target="_blank" rel="noreferrer">Instagram</a>
       </nav>
       <div className="nav-tools">

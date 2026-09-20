@@ -79,9 +79,9 @@ export function Homepage() {
       <section className="collections section" id="collections">
         <SectionHeading eyebrow="Collections" title="Trouvez votre rythme." />
         <div className="collection-grid">
-          {collections.map((collection, index) => (
+          {collections.map((collection) => (
             <a href="#shop" className={`collection-feature collection-feature-${collection.visual}`} key={collection.name}>
-              <div className="collection-art"><span className={`collection-shape collection-shape-${index + 1}`} /></div>
+              <div className="collection-art" style={{ backgroundImage: `url(${collection.image})` }} />
               <div className="collection-content">
                 <p className="eyebrow">{collection.eyebrow}</p>
                 <h3>{collection.name}</h3>

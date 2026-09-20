@@ -20,10 +20,10 @@ import { AdminOrderPage } from './pages/AdminOrderPage'
 import { AdminProductsPage } from './pages/AdminProductsPage'
 import { AdminProductFormPage } from './pages/AdminProductFormPage'
 
-const CustomizerPage = lazy(() => import('./pages/CustomizerPage').then((module) => ({ default: module.CustomizerPage })))
+const CustomizerPage = lazy(() => import('./pages/CustomizerPage'))
 
 function App() {
-  const [theme, setTheme] = useState(() => window.localStorage.getItem('alchemist-theme') || 'light')
+  const [theme, setTheme] = useState(() => window.localStorage.getItem('alchemist-theme') || 'dark')
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     window.localStorage.setItem('alchemist-theme', theme)
