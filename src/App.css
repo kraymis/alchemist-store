@@ -2367,8 +2367,128 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     .product-image, .featured-product .product-image, .shop-grid .product-image { min-height: 285px; }
   }
 
+  @media (min-width: 651px) {
+    .customizer-sidebar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      max-height: none;
+      overflow: visible;
+      align-self: start;
+      border: 0;
+      background: transparent;
+    }
+
+    .customizer-sidebar .sidebar-heading,
+    .customizer-sidebar .sidebar-bottom,
+    .customizer-sidebar .layers-section {
+      grid-column: 1 / -1;
+    }
+
+    .customizer-sidebar .sidebar-heading {
+      padding: 4px 0 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .customizer-sidebar .editor-section {
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    .customizer-sidebar .sidebar-bottom {
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: var(--bg);
+    }
+  }
+
   @media (max-width: 650px) {
     html, body { overflow-x: hidden; }
+  }
+
+  /* Keep studio controls in the page flow on desktop. */
+  @media (min-width: 651px) {
+    .customizer-sidebar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      max-height: none;
+      overflow: visible;
+      align-self: start;
+      border: 0;
+      background: transparent;
+    }
+
+    .customizer-sidebar .sidebar-heading,
+    .customizer-sidebar .sidebar-bottom,
+    .customizer-sidebar .layers-section {
+      grid-column: 1 / -1;
+    }
+
+    .customizer-sidebar .sidebar-heading {
+      padding: 4px 0 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .customizer-sidebar .editor-section {
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    .customizer-sidebar .sidebar-bottom {
+      margin-top: 0;
+      border: 1px solid var(--line);
+      background: var(--bg);
+    }
+  }
+
+  /* The controls belong to the document flow, not a nested scroll window. */
+  .customizer-sidebar {
+    max-height: none;
+    overflow: visible;
+    align-self: start;
+    border: 0;
+    background: transparent;
+  }
+
+  .customizer-sidebar .sidebar-heading {
+    padding: 4px 0 20px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .customizer-sidebar .editor-section {
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .customizer-sidebar .sidebar-bottom {
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  @media (min-width: 1021px) {
+    .customizer-sidebar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .customizer-sidebar .sidebar-heading,
+    .customizer-sidebar .sidebar-bottom {
+      grid-column: 1 / -1;
+    }
+
+    .customizer-sidebar .editor-section {
+      margin-top: 0;
+    }
+
+    .customizer-sidebar .layers-section {
+      grid-column: 1 / -1;
+    }
   }
   .desktop-nav {
     position: fixed;
@@ -2453,4 +2573,14 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   .hero-sticker { top: 8%; right: 7%; }
   .hero-caption { right: 7%; bottom: 22px; }
   .product-image, .featured-product .product-image, .shop-grid .product-image { min-height: 285px; }
+}
+
+@media (min-width: 651px) {
+  .customizer-sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-height: none; overflow: visible; align-self: start; border: 0; background: transparent; }
+  .customizer-sidebar .sidebar-heading,
+  .customizer-sidebar .sidebar-bottom,
+  .customizer-sidebar .layers-section { grid-column: 1 / -1; }
+  .customizer-sidebar .sidebar-heading { padding: 4px 0 20px; border-bottom: 1px solid var(--line); }
+  .customizer-sidebar .editor-section,
+  .customizer-sidebar .sidebar-bottom { margin-top: 0; border: 1px solid var(--line); background: var(--bg); }
 }
