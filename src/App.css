@@ -2650,3 +2650,44 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   .customizer-sidebar .editor-section,
   .customizer-sidebar .sidebar-bottom { margin-top: 0; border: 1px solid var(--line); background: var(--bg); }
 }
+
+/* Keep every studio section content-sized and aligned with the sidebar. */
+.customizer-sidebar,
+.customizer-sidebar > *,
+.customizer-sidebar .editor-section,
+.customizer-sidebar .sidebar-bottom {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.customizer-sidebar .editor-section {
+  align-self: start;
+  min-height: 0;
+  height: fit-content;
+}
+
+.customizer-sidebar .selected-element,
+.customizer-sidebar .empty-element,
+.customizer-sidebar .object-toolbar {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.customizer-sidebar .selected-element {
+  min-height: 0;
+  flex: 0 1 auto;
+}
+
+@media (min-width: 651px) {
+  .customizer-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customizer-sidebar .sidebar-heading,
+  .customizer-sidebar .sidebar-bottom,
+  .customizer-sidebar .layers-section,
+  .customizer-sidebar .editor-section {
+    grid-column: 1;
+  }
+}
