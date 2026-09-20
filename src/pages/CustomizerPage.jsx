@@ -777,7 +777,7 @@ export default function CustomizerPage() {
        * -------------------------
        */
 
-      if (side !== 'front') {
+      if (currentSideRef.current !== 'front') {
         const frontState =
           sideStates.current.front ||
           getStoredDesign('front')
@@ -810,7 +810,7 @@ export default function CustomizerPage() {
        * -------------------------
        */
 
-      if (side !== 'back') {
+      if (currentSideRef.current !== 'back') {
         const backState =
           sideStates.current.back ||
           getStoredDesign('back')
@@ -840,7 +840,7 @@ export default function CustomizerPage() {
       /*
        * Restore original side.
        */
-      if (originalSide !== side) {
+      if (currentSideRef.current !== originalSide) {
         await changeSide(
           originalSide,
         )
@@ -904,8 +904,8 @@ export default function CustomizerPage() {
       const previews = uploaded.files || []
       return {
         ...customization,
-        frontPreview: previews.find((file) => file.role === 'front-preview')?.url,
-        backPreview: previews.find((file) => file.role === 'back-preview')?.url,
+        frontPreview: assetUrl(previews.find((file) => file.role === 'front-preview')?.url),
+        backPreview: assetUrl(previews.find((file) => file.role === 'back-preview')?.url),
       }
     } catch (error) {
       console.error(error)
