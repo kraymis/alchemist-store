@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: alchemist-store-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false
+    disk:
+      name: alchemist-customizations
+      mountPath: /opt/render/project/src/backend/uploads
+      sizeGB: 1

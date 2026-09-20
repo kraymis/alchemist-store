@@ -5,6 +5,8 @@ import api from './routes/api.js'
 
 export const app = express()
 
+app.get('/health', (_req, res) => res.json({ ok: true }))
+
 const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://127.0.0.1:5173',
