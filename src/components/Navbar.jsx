@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { ShoppingBag } from 'lucide-react'
 import { store } from '../data/store'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
@@ -34,7 +35,7 @@ export function Navbar({ theme, onToggleTheme }) {
       <div className="nav-tools">
         <button className="icon-button" type="button" aria-label="Rechercher" onClick={() => setSearchOpen((open) => !open)}>⌕</button>
         <Link className="icon-button wishlist-button nav-desktop-only" to="/shop?wishlist=true" aria-label={`Favoris (${wishlistCount})`}>♡{wishlistCount > 0 && <span>{wishlistCount}</span>}</Link>
-        <Link className="icon-button cart-button" to="/cart" aria-label="Panier">▢<span>{count}</span></Link>
+        <Link className="icon-button cart-button" to="/cart" aria-label={`Panier (${count})`}><ShoppingBag size={18} strokeWidth={1.7} /><span>{count}</span></Link>
         <button className="theme-button" type="button" onClick={onToggleTheme} aria-label="Changer de thème">{theme === 'dark' ? '☀︎' : '☾'}</button>
         <button className="menu-button" type="button" onClick={() => setMenuOpen((open) => !open)} aria-label="Ouvrir le menu"><span /><span /></button>
       </div>
