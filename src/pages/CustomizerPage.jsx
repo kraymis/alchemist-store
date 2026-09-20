@@ -20,7 +20,7 @@ import {
 import { tshirtMockups } from '../data/mockups'
 import { CartContext } from '../context/CartContext'
 import { useToast } from '../context/useToast'
-import { api } from '../lib/api'
+import { api, assetUrl } from '../lib/api'
 
 const CANVAS_WIDTH = 1499
 const CANVAS_HEIGHT = 1049
@@ -499,7 +499,7 @@ export default function CustomizerPage() {
         const metadata = uploaded.files?.[0]
         if (!metadata?.url) throw new Error('Upload failed')
         uploadedFiles.current[currentSideRef.current] = metadata
-        const imageSource = metadata.url
+        const imageSource = assetUrl(metadata.url)
         const image = await FabricImage.fromURL(imageSource, {
           crossOrigin: 'anonymous',
         })
