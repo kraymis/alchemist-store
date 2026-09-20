@@ -1096,589 +1096,124 @@ export default function CustomizerPage() {
    */
 
   return (
-    <main className="customizer-page min-h-screen bg-[#f5f1e8] text-neutral-950 dark:bg-neutral-950 dark:text-white">
-      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
-
-        {/* HEADER */}
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-60"
-          >
-            <ArrowLeft size={18} />
-            Retour
-          </button>
-
-          <div className="text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-500">
-              The Alchemist Store
+    <main className="customizer-page">
+      <div className="customizer-shell">
+        <header className="customizer-intro">
+          <div>
+            <button type="button" onClick={() => navigate(-1)} className="customizer-back">
+              <ArrowLeft size={16} /> Retour
+            </button>
+            <p className="customizer-kicker">The Alchemist Store / Studio</p>
+            <h1>Customize your T-shirt</h1>
+            <p className="customizer-description">
+              Créez votre pièce. Choisissez la couleur, ajoutez une image ou un texte,
+              puis placez votre design exactement où vous le souhaitez.
             </p>
-
-            <h1 className="mt-1 text-2xl font-black uppercase tracking-tight sm:text-3xl">
-              Custom T-Shirt
-            </h1>
           </div>
-
-          <button
-            type="button"
-            onClick={downloadPreview}
-            className="inline-flex items-center gap-2 rounded-full border border-neutral-900/15 bg-white px-4 py-2 text-sm font-bold transition hover:-translate-y-0.5 dark:border-white/15 dark:bg-neutral-900"
-          >
-            <Download size={17} />
-            Exporter
-          </button>
+          <div className="customizer-intro-meta">
+            <span>Home / Customize</span>
+            <button type="button" onClick={downloadPreview} className="customizer-export">
+              <Download size={16} /> Exporter
+            </button>
+          </div>
         </header>
 
-        {/* MAIN */}
-        <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)_300px]">
-
-          {/* LEFT PANEL */}
-          <aside className="order-2 rounded-[28px] border border-black/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-neutral-900 lg:order-1">
-
-            <div className="space-y-7">
-
-              {/* COLORS */}
-              <section>
-                <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-sm font-black uppercase tracking-wider">
-                    Couleur
-                  </h2>
-
-                  <span className="text-xs font-medium text-neutral-500">
-                    {mockup.name}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-
-                  {tshirtMockups.map(
-                    (item) => {
-                      const active =
-                        item.id === colorId
-
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          aria-label={`T-shirt ${item.name}`}
-                          onClick={() =>
-                            setColorId(
-                              item.id,
-                            )
-                          }
-                          className={[
-                            'relative h-11 w-11 rounded-full border-2 transition',
-                            active
-                              ? 'scale-110 border-neutral-950 ring-2 ring-neutral-950/20 dark:border-white dark:ring-white/20'
-                              : 'border-neutral-300 hover:scale-105 dark:border-neutral-700',
-                          ].join(' ')}
-                          style={{
-                            backgroundColor:
-                              item.color,
-                          }}
-                        >
-                          {item.id ===
-                            'white' && (
-                            <span className="absolute inset-1 rounded-full border border-black/10" />
-                          )}
-                        </button>
-                      )
-                    },
-                  )}
-
-                </div>
-              </section>
-
-              {/* SIDE */}
-              <section>
-                <h2 className="mb-3 text-sm font-black uppercase tracking-wider">
-                  Face
-                </h2>
-
-                <div className="grid grid-cols-2 gap-2 rounded-2xl bg-neutral-100 p-1 dark:bg-neutral-800">
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      changeSide('front')
-                    }
-                    className={[
-                      'rounded-xl px-3 py-2 text-sm font-bold transition',
-                      side === 'front'
-                        ? 'bg-white shadow-sm dark:bg-neutral-950'
-                        : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white',
-                    ].join(' ')}
-                  >
-                    Devant
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      changeSide('back')
-                    }
-                    className={[
-                      'rounded-xl px-3 py-2 text-sm font-bold transition',
-                      side === 'back'
-                        ? 'bg-white shadow-sm dark:bg-neutral-950'
-                        : 'text-neutral-500 hover:text-neutral-950 dark:hover:text-white',
-                    ].join(' ')}
-                  >
-                    Dos
-                  </button>
-
-                </div>
-              </section>
-
-              {/* ADD */}
-              <section>
-                <h2 className="mb-3 text-sm font-black uppercase tracking-wider">
-                  Ajouter
-                </h2>
-
-                <div className="space-y-2">
-
-                  <button
-                    type="button"
-                    onClick={addText}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-black/10 bg-neutral-50 px-4 py-3 text-left text-sm font-bold transition hover:-translate-y-0.5 hover:bg-neutral-100 dark:border-white/10 dark:bg-neutral-800 dark:hover:bg-neutral-700"
-                  >
-                    <Type size={18} />
-                    Ajouter du texte
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      fileInput.current?.click()
-                    }
-                    className="flex w-full items-center gap-3 rounded-2xl border border-black/10 bg-neutral-50 px-4 py-3 text-left text-sm font-bold transition hover:-translate-y-0.5 hover:bg-neutral-100 dark:border-white/10 dark:bg-neutral-800 dark:hover:bg-neutral-700"
-                  >
-                    <ImagePlus size={18} />
-                    Ajouter une image
-                  </button>
-
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
-                    className="hidden"
-                    onChange={
-                      uploadDesign
-                    }
-                  />
-
-                </div>
-              </section>
-
-              {/* HELP */}
-              <section className="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800">
-
-                <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                  Conseil
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
-                  Place ton design directement
-                  sur le T-shirt comme tu
-                  souhaites qu’il soit imprimé.
-                  Il n’y a volontairement aucune
-                  limite de placement.
-                </p>
-
-              </section>
-
+        <div className="customizer-editor">
+          <section className="customizer-preview-panel">
+            <div className="preview-panel-head">
+              <div>
+                <span className="panel-eyebrow">Preview / 01</span>
+                <h2>T-shirt {mockup.name}</h2>
+              </div>
+              <span className="preview-status"><span /> Design libre</span>
             </div>
-          </aside>
 
-          {/* CANVAS */}
-          <section className="order-1 min-w-0 lg:order-2">
+            <div className="preview-switcher" role="tablist" aria-label="Face du t-shirt">
+              <button type="button" role="tab" aria-selected={side === 'front'} className={side === 'front' ? 'active' : ''} onClick={() => changeSide('front')}>
+                Devant
+              </button>
+              <button type="button" role="tab" aria-selected={side === 'back'} className={side === 'back' ? 'active' : ''} onClick={() => changeSide('back')}>
+                Dos
+              </button>
+            </div>
 
-            <div className="overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-neutral-900">
-
-              {/* TOOLBAR */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-4 py-3 dark:border-white/10">
-
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-neutral-400">
-                    {side === 'front'
-                      ? 'Front'
-                      : 'Back'}
-                  </p>
-
-                  <p className="text-sm font-bold">
-                    T-shirt {mockup.name}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1">
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      scaleSelected(-0.05)
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Réduire"
-                  >
-                    <Minus size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      scaleSelected(0.05)
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Agrandir"
-                  >
-                    <Plus size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      rotateSelected(-15)
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Tourner à gauche"
-                  >
-                    <RotateCcw size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      rotateSelected(15)
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Tourner à droite"
-                  >
-                    <RotateCw size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      moveLayer('down')
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Descendre"
-                  >
-                    <ChevronDown size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={() =>
-                      moveLayer('up')
-                    }
-                    className="rounded-lg p-2 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-neutral-800"
-                    title="Monter"
-                  >
-                    <ChevronUp size={17} />
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={
-                      !hasSelectedObject
-                    }
-                    onClick={
-                      deleteSelected
-                    }
-                    className="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-30 dark:hover:bg-red-950/30"
-                    title="Supprimer"
-                  >
-                    <Trash2 size={17} />
-                  </button>
-
-                </div>
+            <div className="customizer-canvas-stage">
+              <div className="customizer-canvas-frame">
+                <canvas ref={canvasElement} className="customizer-canvas" />
               </div>
+            </div>
 
-              {/* CANVAS */}
-              <div className="flex w-full justify-center overflow-auto bg-[#e9e4d9] p-3 sm:p-6 dark:bg-neutral-800">
-
-                <div className="w-full max-w-[1100px]">
-
-                  <div className="relative w-full overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-neutral-950">
-
-                    <canvas
-                      ref={canvasElement}
-                      className="block h-auto w-full"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* INFO */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/10 px-4 py-3 dark:border-white/10">
-
-                <div className="flex items-center gap-2 text-xs text-neutral-500">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  Design libre
-                </div>
-
-                <div className="text-xs font-medium text-neutral-500">
-                  Fais glisser, redimensionne ou
-                  tourne ton design.
-                </div>
-
-              </div>
-
+            <div className="preview-footer">
+              <span>Glissez, redimensionnez ou faites pivoter votre design.</span>
+              <span>{side === 'front' ? 'FRONT' : 'BACK'} / {mockup.name.toUpperCase()}</span>
             </div>
           </section>
 
-          {/* RIGHT PANEL */}
-          <aside className="order-3 rounded-[28px] border border-black/10 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-neutral-900">
+          <aside className="customizer-sidebar">
+            <div className="sidebar-heading">
+              <span className="panel-eyebrow">Studio controls</span>
+              <h2>Customization</h2>
+            </div>
 
-            <div className="space-y-6">
+            <section className="editor-section">
+              <div className="section-title"><span className="section-number">01</span><h3>Product</h3></div>
+              <div className="control-label-row"><span>Color</span><strong>{mockup.name}</strong></div>
+              <div className="color-swatches">
+                {tshirtMockups.map((item) => (
+                  <button key={item.id} type="button" aria-label={`T-shirt ${item.name}`} aria-pressed={item.id === colorId} className={item.id === colorId ? 'selected' : ''} onClick={() => setColorId(item.id)} style={{ backgroundColor: item.color }}>
+                    {item.id === 'white' && <span />}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-              {/* SELECTED */}
-              <section>
+            <section className="editor-section">
+              <div className="section-title"><span className="section-number">02</span><h3>Design</h3></div>
+              <div className="design-actions">
+                <button type="button" onClick={addText}><span className="action-icon"><Type size={18} /></span><span><strong>Add text</strong><small>Write a custom message</small></span><Plus size={16} /></button>
+                <button type="button" onClick={() => fileInput.current?.click()}><span className="action-icon"><Upload size={18} /></span><span><strong>Upload image</strong><small>PNG, JPG, WEBP or SVG</small></span><Plus size={16} /></button>
+                <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml" className="hidden" onChange={uploadDesign} />
+              </div>
+            </section>
 
-                <div className="mb-3 flex items-center justify-between">
-
-                  <h2 className="text-sm font-black uppercase tracking-wider">
-                    Élément sélectionné
-                  </h2>
-
-                  <Layers3
-                    size={17}
-                    className="text-neutral-400"
-                  />
-
+            <section className="editor-section">
+              <div className="section-title"><span className="section-number">03</span><h3>Selected element</h3><span className="section-count">{hasSelectedObject ? '01' : '00'}</span></div>
+              {selectedObject ? (
+                <div className="selected-element">
+                  <div><strong>{selectedObject.type === 'i-text' ? 'Text layer' : selectedObject.type === 'image' ? 'Image layer' : 'Design layer'}</strong><small>Active on {side}</small></div>
+                  <button type="button" onClick={deleteSelected} aria-label="Delete selected element"><Trash2 size={17} /></button>
                 </div>
+              ) : (
+                <div className="empty-element"><Layers3 size={17} /><span>Select an element on the preview to edit it.</span></div>
+              )}
+              <div className="object-toolbar">
+                <button type="button" disabled={!hasSelectedObject} onClick={() => scaleSelected(-0.05)} title="Réduire"><Minus size={17} /><span>Smaller</span></button>
+                <button type="button" disabled={!hasSelectedObject} onClick={() => scaleSelected(0.05)} title="Agrandir"><Plus size={17} /><span>Larger</span></button>
+                <button type="button" disabled={!hasSelectedObject} onClick={() => rotateSelected(-15)} title="Tourner à gauche"><RotateCcw size={17} /><span>Rotate</span></button>
+                <button type="button" disabled={!hasSelectedObject} onClick={() => rotateSelected(15)} title="Tourner à droite"><RotateCw size={17} /><span>Turn</span></button>
+                <button type="button" disabled={!hasSelectedObject} onClick={() => moveLayer('down')} title="Descendre"><ChevronDown size={17} /><span>Down</span></button>
+                <button type="button" disabled={!hasSelectedObject} onClick={() => moveLayer('up')} title="Monter"><ChevronUp size={17} /><span>Up</span></button>
+              </div>
+            </section>
 
-                {selectedObject ? (
-                  <div className="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800">
-
-                    <p className="text-sm font-bold">
-                      {selectedObject.type ===
-                      'i-text'
-                        ? 'Texte'
-                        : selectedObject.type ===
-                            'image'
-                          ? 'Image'
-                          : 'Élément'}
-                    </p>
-
-                    <p className="mt-1 text-xs text-neutral-500">
-                      Sélectionné
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={
-                        deleteSelected
-                      }
-                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700"
-                    >
-                      <Trash2 size={16} />
-                      Supprimer
-                    </button>
-
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-black/10 p-4 text-sm leading-6 text-neutral-500 dark:border-white/10">
-                    Sélectionne un texte ou une
-                    image pour modifier sa taille,
-                    sa rotation ou sa position.
-                  </div>
-                )}
-
-              </section>
-
-              {/* LAYERS */}
-              <section>
-
-                <div className="mb-3 flex items-center justify-between">
-
-                  <h2 className="text-sm font-black uppercase tracking-wider">
-                    Calques
-                  </h2>
-
-                  <span className="text-xs font-bold text-neutral-400">
-                    {layers.length}
-                  </span>
-
+            <section className="editor-section layers-section">
+              <div className="section-title"><span className="section-number">04</span><h3>Layers</h3><span className="section-count">{String(layers.length).padStart(2, '0')}</span></div>
+              {layers.length > 0 ? (
+                <div className="layer-list">
+                  {layers.map((layer, index) => {
+                    const active = layer === selectedObject
+                    return <button key={`${layer.type}-${index}`} type="button" className={active ? 'active' : ''} onClick={() => { const canvas = canvasRef.current; if (!canvas) return; canvas.setActiveObject(layer); canvas.requestRenderAll(); setSelectedObject(layer) }}><Layers3 size={15} /><span>{layer.type === 'i-text' ? 'Text' : layer.type === 'image' ? 'Image' : layer.type}</span><span className="layer-index">{String(layers.length - index).padStart(2, '0')}</span></button>
+                  })}
                 </div>
+              ) : <p className="empty-layers">Your added elements will appear here.</p>}
+            </section>
 
-                {layers.length > 0 ? (
-                  <div className="space-y-2">
-
-                    {layers.map(
-                      (layer, index) => {
-                        const active =
-                          layer ===
-                          selectedObject
-
-                        return (
-                          <button
-                            key={`${layer.type}-${index}`}
-                            type="button"
-                            onClick={() => {
-                              const canvas =
-                                canvasRef.current
-
-                              if (!canvas)
-                                return
-
-                              canvas.setActiveObject(
-                                layer,
-                              )
-
-                              canvas.requestRenderAll()
-
-                              setSelectedObject(
-                                layer,
-                              )
-                            }}
-                            className={[
-                              'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition',
-                              active
-                                ? 'bg-neutral-950 font-bold text-white dark:bg-white dark:text-neutral-950'
-                                : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700',
-                            ].join(' ')}
-                          >
-                            <Layers3
-                              size={15}
-                            />
-
-                            <span>
-                              {layer.type ===
-                              'i-text'
-                                ? 'Texte'
-                                : layer.type ===
-                                    'image'
-                                  ? 'Image'
-                                  : layer.type}
-                            </span>
-                          </button>
-                        )
-                      },
-                    )}
-
-                  </div>
-                ) : (
-                  <p className="rounded-xl bg-neutral-100 p-3 text-xs text-neutral-500 dark:bg-neutral-800">
-                    Aucun élément ajouté.
-                  </p>
-                )}
-
-              </section>
-
-              {/* PRICE */}
-              <section className="border-t border-black/10 pt-5 dark:border-white/10">
-
-                <div className="flex items-end justify-between">
-
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                      Prix
-                    </p>
-
-                    <p className="mt-1 text-3xl font-black">
-                      3 200 DA
-                    </p>
-                  </div>
-
-                  <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-bold dark:bg-neutral-800">
-                    Taille M
-                  </span>
-
-                </div>
-
-              </section>
-
-              {/* ACTIONS */}
-              <section className="space-y-2">
-
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={saveDesign}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white px-4 py-3.5 text-sm font-black transition hover:-translate-y-0.5 hover:bg-neutral-50 disabled:cursor-wait disabled:opacity-60 dark:border-white/10 dark:bg-neutral-900 dark:hover:bg-neutral-800"
-                >
-                  <Save size={18} />
-
-                  {saving
-                    ? 'Sauvegarde...'
-                    : saved
-                      ? 'Personnalisation sauvegardée'
-                      : 'Sauvegarder'}
-                </button>
-
-                <button
-                  type="button"
-                  disabled={saving}
-                  onClick={addToCart}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-neutral-950 px-4 py-4 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-neutral-800 disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200"
-                >
-                  <ShoppingBag size={18} />
-
-                  Ajouter au panier —
-                  3 200 DA
-                </button>
-
-              </section>
-
-              {/* INFO */}
-              <section className="rounded-2xl bg-neutral-100 p-4 dark:bg-neutral-800">
-
-                <div className="flex items-start gap-3">
-
-                  <Upload
-                    size={17}
-                    className="mt-0.5 shrink-0 text-neutral-500"
-                  />
-
-                  <div>
-
-                    <p className="text-sm font-bold">
-                      Ton design
-                    </p>
-
-                    <p className="mt-1 text-xs leading-5 text-neutral-500">
-                      PNG, JPG, WEBP ou SVG.
-                      Tu peux déplacer, agrandir,
-                      réduire et faire pivoter ton
-                      design librement sur le
-                      T-shirt.
-                    </p>
-
-                  </div>
-
-                </div>
-
-              </section>
-
+            <div className="sidebar-bottom">
+              <div className="price-row"><div><span>Custom piece</span><strong>3 200 DA</strong></div><span className="size-badge">Size M</span></div>
+              <button type="button" disabled={saving} onClick={saveDesign} className="save-button"><Save size={17} />{saving ? 'Sauvegarde...' : saved ? 'Personnalisation sauvegardée' : 'Sauvegarder le design'}</button>
+              <button type="button" disabled={saving} onClick={addToCart} className="cart-button"><ShoppingBag size={18} />Ajouter au panier <span>3 200 DA</span></button>
             </div>
           </aside>
-
         </div>
       </div>
     </main>
