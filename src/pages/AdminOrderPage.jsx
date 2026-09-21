@@ -12,8 +12,8 @@ function fileExtension(file) {
 
 function previewFiles(item) {
   return [
-    item.frontImage ? { url: item.frontImage, label: 'FRONT' } : null,
-    item.backImage ? { url: item.backImage, label: 'BACK' } : null,
+    (item.frontPreview || item.frontImage) ? { url: item.frontPreview || item.frontImage, label: 'FRONT' } : null,
+    (item.backPreview || item.backImage) ? { url: item.backPreview || item.backImage, label: 'BACK' } : null,
   ].filter((file, index, files) => file && files.findIndex((candidate) => candidate?.url === file.url) === index)
 }
 
