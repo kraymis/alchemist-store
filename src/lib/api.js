@@ -2,7 +2,14 @@ export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/ap
 export const API_ORIGIN = API_URL.replace(/\/api\/?$/, '')
 
 export function assetUrl(path) {
-  if (!path || path.startsWith('data:') || path.startsWith('http')) return path
+  if (!path || path.startsWith('data:')) return path
+
+  if (path.startsWith('http://localhost:5000')) {
+    return `${API_ORIGIN}${path.slice('http://localhost:5000'.length)}`
+  }
+
+  if (path.startsWith('http://') || path.startsWith('https://')) return path
+
   return `${API_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`
 }
 

@@ -71,6 +71,7 @@ export default function CustomizerPage() {
   const fileInput = useRef(null)
 
   const currentSideRef = useRef('front')
+  const mockupRequestRef = useRef(0)
 
   const sideStates = useRef({
     front: null,
@@ -148,10 +149,17 @@ export default function CustomizerPage() {
 
       if (!canvas) return
 
+      const requestId = mockupRequestRef.current + 1
+      mockupRequestRef.current = requestId
+
       try {
         const image = await FabricImage.fromURL(imageSource, {
           crossOrigin: 'anonymous',
         })
+
+        if (canvasRef.current !== canvas || mockupRequestRef.current !== requestId) {
+          return
+        }
 
         /*
          * The mockup occupies the entire internal canvas.
@@ -294,6 +302,7 @@ export default function CustomizerPage() {
     })
 
     canvasRef.current = canvas
+    currentSideRef.current = 'front'
 
     const handleSelectionCreated = (event) => {
       const object = event.selected?.[0] || null
@@ -351,9 +360,9 @@ export default function CustomizerPage() {
     /*
      * Load the mockup first.
      */
-    setMockupBackground(
-      tshirtMockups[0].frontImage,
-    ).then(async () => {
+    setMockupBackground(tshirtMockups[0].frontImage).then(async () => {
+      if (canvasRef.current !== canvas) return
+
       /*
        * Then load saved artwork.
        */
@@ -363,6 +372,7 @@ export default function CustomizerPage() {
     })
 
     return () => {
+      mockupRequestRef.current += 1
       canvas.dispose()
       canvasRef.current = null
     }
