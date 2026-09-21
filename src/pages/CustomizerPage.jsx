@@ -742,6 +742,12 @@ export default function CustomizerPage() {
 
       setSide(nextSide)
 
+      await setMockupBackground(
+        nextSide === 'front'
+          ? mockup.frontImage
+          : mockup.backImage,
+      )
+
       /*
        * Load the next side artwork.
        */
@@ -752,7 +758,10 @@ export default function CustomizerPage() {
     },
     [
       loadArtworkState,
+      mockup.backImage,
+      mockup.frontImage,
       saveCurrentSide,
+      setMockupBackground,
       side,
     ],
   )
@@ -811,6 +820,8 @@ export default function CustomizerPage() {
       sideStates.current.front =
         frontState
 
+      await loadArtworkState(frontState)
+
       const frontPreview =
         exportCurrentCanvas()
 
@@ -843,6 +854,8 @@ export default function CustomizerPage() {
 
       sideStates.current.back =
         backState
+
+      await loadArtworkState(backState)
 
       const backPreview =
         exportCurrentCanvas()
