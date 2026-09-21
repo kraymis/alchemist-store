@@ -714,7 +714,7 @@ export default function CustomizerPage() {
 
   const changeSide = useCallback(
     async (nextSide) => {
-      if (nextSide === side) return
+      if (nextSide === currentSideRef.current) return
 
       /*
        * Save current artwork first.
@@ -723,7 +723,7 @@ export default function CustomizerPage() {
         saveCurrentSide()
 
       if (currentState) {
-        sideStates.current[side] =
+        sideStates.current[currentSideRef.current] =
           currentState
       }
 
@@ -762,7 +762,6 @@ export default function CustomizerPage() {
       mockup.frontImage,
       saveCurrentSide,
       setMockupBackground,
-      side,
     ],
   )
 
